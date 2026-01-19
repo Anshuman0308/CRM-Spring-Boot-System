@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; margin-bottom: 30px; }
+        .tabs { display: flex; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; border: none; background: #ecf0f1; }
+        .tab.active { background: #3498db; color: white; }
+        .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #2980b9; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background: #f8f9fa; }
+        .hidden { display: none; }
+        .search-bar { margin-bottom: 20px; }
+        .search-bar input { width: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CRM Management System</h1>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('customers')">Customers</button>
+            <button class="tab" onclick="showTab('offers')">Offers</button>
+            <button class="tab" onclick="showTab('products')">Products</button>
+            <button class="tab" onclick="showTab('payments')">Payments</button>
+            <button class="tab" onclick="showTab('companies')">Companies</button>
+        </div>
+
+        <!-- Customers Tab -->
+        <div id="customers" class="content">
+            <h2>Customer Management</h2>
+            <div class="search-bar">
+                <input type="text" id="customerSearch" placeholder="Search by email or phone...">
+                <button class="btn" onclick="searchCustomer()">Search</button>
+            </div>
+            
+            <form id="customerForm">
+                <div class="form-group">
+                    <label>First Name:</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name:</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="text" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>Address:</label>
+                    <input type="text" id="address">
+                </div>
+                <button type="button" class="btn" onclick="saveCustomer()">Save Customer</button>
+                <button type="button" class="btn" onclick="loadCustomers()">Load All</button>
+            </form>
+            
+            <table class="table" id="customersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Offers Tab -->
+        <div id="offers" class="content hidden">
+            <h2>Offer Management</h2>
+            
+            <form id="offerForm">
+                <div class="form-group">
+                    <label>Customer ID:</label>
+                    <input type="number" id="offerCustomerId" required>
+                </div>
+                <div class="form-group">
+                    <label>Company ID:</label>
+                    <input type="number" id="offerCompanyId" required>
+                </div>
+                <div class="form-group">
+                    <label>Offer Details:</label>
+                    <input type="text" id="offerDetails" required>
+                </div>
+                <div class="form-group">
+                    <label>Offer Date:</label>
+                    <input type="date" id="offerDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="offerStatus">
+                        <option value="PENDING">Pending</option>
+                        <option value="ACCEPTED">Accepted</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+                <button type="button" class="btn" onclick="saveOffer()">Save Offer</button>
+                <button type="button" class="btn" onclick="loadOffers()">Load All</button>
+            </form>
+            
+            <table class="table" id="offersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer ID</th>
+                        <th>Details</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products" class="content hidden">
+            <h2>Product Management</h2>
+            
+            <form id="productForm">
+                <div class="form-group">
+                    <label>Product Name:</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>Category:</label>
+                    <input type="text" id="productCategory" required>
+                </div>
+                <div class="form-group">
+                    <label>Brand:</label>
+                    <input type="text" id="productBrand" required>
+                </div>
+                <div class="form-group">
+                    <label>Price:</label>
+                    <input type="number" step="0.01" id="productPrice" required>
+                </div>
+                <button type="button" class="btn" onclick="saveProduct()">Save Product</button>
+                <button type="button" class="btn" onclick="loadProducts()">Load All</button>
+            </form>
+            
+            <table class="table" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Payments Tab -->
+        <div id="payments" class="content hidden">
+            <h2>Payment Management</h2>
+            
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>Offer ID:</label>
+                    <input type="number" id="paymentOfferId" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount:</label>
+                    <input type="number" step="0.01" id="paymentAmount" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Date:</label>
+                    <input type="date" id="paymentDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Method:</label>
+                    <select id="paymentMethod">
+                        <option value="CREDIT_CARD">Credit Card</option>
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="CASH">Cash</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="paymentStatus">
+                        <option value="PENDING">Pending</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+                <button type="button" class="btn" onclick="savePayment()">Save Payment</button>
+                <button type="button" class="btn" onclick="loadPayments()">Load All</button>
+            </form>
+            
+            <table class="table" id="paymentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Offer ID</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Companies Tab -->
+        <div id="companies" class="content hidden">
+            <h2>Company Management</h2>
+            
+            <form id="companyForm">
+                <div class="form-group">
+                    <label>Company Name:</label>
+                    <input type="text" id="companyName" required>
+                </div>
+                <div class="form-group">
+                    <label>Address:</label>
+                    <input type="text" id="companyAddress" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="text" id="companyPhone" required>
+                </div>
+                <button type="button" class="btn" onclick="saveCompany()">Save Company</button>
+                <button type="button" class="btn" onclick="loadCompanies()">Load All</button>
+            </form>
+            
+            <table class="table" id="companiesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
