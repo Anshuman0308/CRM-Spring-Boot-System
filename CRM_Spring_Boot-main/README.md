@@ -17,7 +17,7 @@ Simple 3-layer architecture: **Frontend** → **Backend APIs** → **Database**
 - **Category** - Product categories
 - **Brand** - Product brands
 - **City/Country/District** - Geographic data
-
+dd
 ### **Repositories (Database Access)**
 - **CustomerRepository** - Database operations for customers
 - **OfferRepository** - Database operations for offers
