@@ -9,7 +9,7 @@ Customer - Customer information (name, email, phone, address)
 Company - Company details (name, address, phone)
 Offer - Business offers linking customers and companies
 Payment - Payment records for offers
-Products - Product catalog (name, category, brand, price)
+Products - Product catalog (name, category, brand, price)X
 Category - Product categories
 Brand - Product brands
 City/Country/District - Geographic data dd
