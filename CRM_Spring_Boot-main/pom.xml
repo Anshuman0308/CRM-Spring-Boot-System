@@ -80,7 +80,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <excludeDevtools>false</excludeDevtools>
+                        <exclude>org.springframework.boot:spring-boot-devtools</exclude>
                     </excludes>
                     <jvmArguments>
                         -XX:+EnableDynamicAgentLoading
