@@ -4,268 +4,429 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --success: #22c55e;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #334155;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --radius: 12px;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; margin-bottom: 30px; }
-        .tabs { display: flex; background: white; border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; border: none; background: #ecf0f1; }
-        .tab.active { background: #3498db; color: white; }
-        .content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        .btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
-        .btn:hover { background: #2980b9; }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        .table th { background: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh; z-index: 10;
+        }
+        .logo { padding: 0 20px 28px; font-size: 1.2rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+        .logo span { color: var(--text-muted); font-weight: 400; }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px; padding: 11px 20px;
+            cursor: pointer; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+            border-left: 3px solid transparent; transition: all 0.2s;
+        }
+        .nav-item:hover { color: var(--text); background: rgba(99,102,241,0.08); }
+        .nav-item.active { color: var(--primary); border-left-color: var(--primary); background: rgba(99,102,241,0.12); }
+        .nav-icon { font-size: 1.1rem; }
+
+        /* Main */
+        .main { margin-left: 220px; flex: 1; padding: 32px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.6rem; font-weight: 700; }
+        .page-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+
+        /* Card */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 24px;
+        }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 18px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; }
+
+        /* Form Grid */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); }
+        .form-group input, .form-group select {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            padding: 9px 12px; border-radius: 8px; font-size: 0.875rem; font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .form-group select option { background: var(--surface); }
+        .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+        /* Buttons */
+        .btn {
+            padding: 9px 18px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 0.875rem; font-weight: 500; font-family: inherit; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-ghost { background: var(--surface2); color: var(--text); }
+        .btn-ghost:hover { background: var(--border); }
+        .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 5px 12px; font-size: 0.8rem; }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        /* Search */
+        .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-row input { flex: 1; max-width: 320px; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 0.875rem; font-family: inherit; }
+        .search-row input:focus { outline: none; border-color: var(--primary); }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        thead th { padding: 10px 14px; text-align: left; color: var(--text-muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+        tbody td { padding: 12px 14px; border-bottom: 1px solid rgba(51,65,85,0.5); }
+        tbody tr:hover { background: rgba(99,102,241,0.05); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* Badge */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+        .badge-pending { background: rgba(234,179,8,0.15); color: #eab308; }
+        .badge-accepted, .badge-completed { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .badge-rejected, .badge-cancelled { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 28px; right: 28px; padding: 12px 20px;
+            border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+            opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 999;
+        }
+        #toast.show { opacity: 1; transform: translateY(0); background: #1e293b; color: var(--text); border: 1px solid var(--border); }
+        #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
+        #toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+
         .hidden { display: none; }
-        .search-bar { margin-bottom: 20px; }
-        .search-bar input { width: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+
+        /* Invoice Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-box {
+            background: #fff; color: #111; border-radius: 12px;
+            width: 680px; max-height: 90vh; overflow-y: auto; padding: 48px;
+            position: relative;
+        }
+        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; }
+        .inv-brand { font-size: 1.5rem; font-weight: 700; color: #6366f1; }
+        .inv-brand small { display: block; font-size: 0.8rem; font-weight: 400; color: #64748b; margin-top: 2px; }
+        .inv-meta { text-align: right; font-size: 0.85rem; color: #475569; }
+        .inv-meta strong { display: block; font-size: 1rem; color: #111; }
+        .inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        .inv-party h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; }
+        .inv-party p { font-size: 0.875rem; color: #334155; line-height: 1.6; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 0.875rem; }
+        .inv-table th { background: #f1f5f9; padding: 10px 14px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+        .inv-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+        .inv-status { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .inv-status.ACCEPTED { background: #dcfce7; color: #166534; }
+        .inv-status.PENDING  { background: #fef9c3; color: #854d0e; }
+        .inv-status.REJECTED { background: #fee2e2; color: #991b1b; }
+        .inv-footer { border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 0.8rem; color: #94a3b8; text-align: center; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+        .btn-print { background: #6366f1; color: white; padding: 9px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 500; }
+        .btn-close-modal { background: #f1f5f9; color: #334155; padding: 9px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 500; }
+
+        @media print {
+            .sidebar, .page-header, #inv-lookup-card, .nav-item { display: none !important; }
+            .main { margin-left: 0 !important; padding: 0 !important; }
+            #invoiceResult { display: block !important; }
+            #invoiceResult .card { box-shadow: none; border: none; }
+            #inv-actions { display: none !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>CRM Management System</h1>
-    </div>
-    
-    <div class="container">
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('customers')">Customers</button>
-            <button class="tab" onclick="showTab('offers')">Offers</button>
-            <button class="tab" onclick="showTab('products')">Products</button>
-            <button class="tab" onclick="showTab('payments')">Payments</button>
-            <button class="tab" onclick="showTab('companies')">Companies</button>
-        </div>
 
-        <!-- Customers Tab -->
-        <div id="customers" class="content">
-            <h2>Customer Management</h2>
-            <div class="search-bar">
-                <input type="text" id="customerSearch" placeholder="Search by email or phone...">
-                <button class="btn" onclick="searchCustomer()">Search</button>
-            </div>
-            
+<nav class="sidebar">
+    <div class="logo">CRM <span>System</span></div>
+    <div class="nav-item active" onclick="showTab('customers', this)"><span class="nav-icon">&#128101;</span> Customers</div>
+    <div class="nav-item" onclick="showTab('products', this)"><span class="nav-icon">&#128230;</span> Products</div>
+    <div class="nav-item" onclick="showTab('payments', this)"><span class="nav-icon">&#128179;</span> Payments</div>
+    <div class="nav-item" onclick="showTab('companies', this)"><span class="nav-icon">&#127970;</span> Companies</div>
+    <div class="nav-item" onclick="showTab('invoices', this)"><span class="nav-icon">&#128221;</span> Invoices</div>
+</nav>
+
+<main class="main">
+
+    <!-- Customers -->
+    <div id="customers">
+        <div class="page-header"><h1>Customers</h1><p>Manage your customer records</p></div>
+        <div class="card">
+            <div class="card-title">Add / Edit Customer</div>
             <form id="customerForm">
-                <div class="form-group">
-                    <label>First Name:</label>
-                    <input type="text" id="firstName" required>
+                <div class="form-grid">
+                    <div class="form-group"><label>First Name</label><input type="text" id="firstName" required></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" id="lastName" required></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="email" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="phone"></div>
+                    <div class="form-group"><label>Address</label><input type="text" id="address"></div>
                 </div>
-                <div class="form-group">
-                    <label>Last Name:</label>
-                    <input type="text" id="lastName" required>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+                    <button type="button" class="btn btn-ghost" onclick="loadCustomers()">Refresh</button>
                 </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone:</label>
-                    <input type="text" id="phone">
-                </div>
-                <div class="form-group">
-                    <label>Address:</label>
-                    <input type="text" id="address">
-                </div>
-                <button type="button" class="btn" onclick="saveCustomer()">Save Customer</button>
-                <button type="button" class="btn" onclick="loadCustomers()">Load All</button>
             </form>
-            
-            <table class="table" id="customersTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
         </div>
-
-        <!-- Offers Tab -->
-        <div id="offers" class="content hidden">
-            <h2>Offer Management</h2>
-            
-            <form id="offerForm">
-                <div class="form-group">
-                    <label>Customer ID:</label>
-                    <input type="number" id="offerCustomerId" required>
-                </div>
-                <div class="form-group">
-                    <label>Company ID:</label>
-                    <input type="number" id="offerCompanyId" required>
-                </div>
-                <div class="form-group">
-                    <label>Offer Details:</label>
-                    <input type="text" id="offerDetails" required>
-                </div>
-                <div class="form-group">
-                    <label>Offer Date:</label>
-                    <input type="date" id="offerDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Status:</label>
-                    <select id="offerStatus">
-                        <option value="PENDING">Pending</option>
-                        <option value="ACCEPTED">Accepted</option>
-                        <option value="REJECTED">Rejected</option>
-                    </select>
-                </div>
-                <button type="button" class="btn" onclick="saveOffer()">Save Offer</button>
-                <button type="button" class="btn" onclick="loadOffers()">Load All</button>
-            </form>
-            
-            <table class="table" id="offersTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer ID</th>
-                        <th>Details</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <!-- Products Tab -->
-        <div id="products" class="content hidden">
-            <h2>Product Management</h2>
-            
-            <form id="productForm">
-                <div class="form-group">
-                    <label>Product Name:</label>
-                    <input type="text" id="productName" required>
-                </div>
-                <div class="form-group">
-                    <label>Category:</label>
-                    <input type="text" id="productCategory" required>
-                </div>
-                <div class="form-group">
-                    <label>Brand:</label>
-                    <input type="text" id="productBrand" required>
-                </div>
-                <div class="form-group">
-                    <label>Price:</label>
-                    <input type="number" step="0.01" id="productPrice" required>
-                </div>
-                <button type="button" class="btn" onclick="saveProduct()">Save Product</button>
-                <button type="button" class="btn" onclick="loadProducts()">Load All</button>
-            </form>
-            
-            <table class="table" id="productsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Brand</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <!-- Payments Tab -->
-        <div id="payments" class="content hidden">
-            <h2>Payment Management</h2>
-            
-            <form id="paymentForm">
-                <div class="form-group">
-                    <label>Offer ID:</label>
-                    <input type="number" id="paymentOfferId" required>
-                </div>
-                <div class="form-group">
-                    <label>Amount:</label>
-                    <input type="number" step="0.01" id="paymentAmount" required>
-                </div>
-                <div class="form-group">
-                    <label>Payment Date:</label>
-                    <input type="date" id="paymentDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Method:</label>
-                    <select id="paymentMethod">
-                        <option value="CREDIT_CARD">Credit Card</option>
-                        <option value="BANK_TRANSFER">Bank Transfer</option>
-                        <option value="CASH">Cash</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Status:</label>
-                    <select id="paymentStatus">
-                        <option value="PENDING">Pending</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
-                    </select>
-                </div>
-                <button type="button" class="btn" onclick="savePayment()">Save Payment</button>
-                <button type="button" class="btn" onclick="loadPayments()">Load All</button>
-            </form>
-            
-            <table class="table" id="paymentsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Offer ID</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Method</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <!-- Companies Tab -->
-        <div id="companies" class="content hidden">
-            <h2>Company Management</h2>
-            
-            <form id="companyForm">
-                <div class="form-group">
-                    <label>Company Name:</label>
-                    <input type="text" id="companyName" required>
-                </div>
-                <div class="form-group">
-                    <label>Address:</label>
-                    <input type="text" id="companyAddress" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone:</label>
-                    <input type="text" id="companyPhone" required>
-                </div>
-                <button type="button" class="btn" onclick="saveCompany()">Save Company</button>
-                <button type="button" class="btn" onclick="loadCompanies()">Load All</button>
-            </form>
-            
-            <table class="table" id="companiesTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="card">
+            <div class="search-row">
+                <input type="text" id="customerSearch" placeholder="Search by email or phone">
+                <button class="btn btn-ghost" onclick="searchCustomer()">Search</button>
+            </div>
+            <div class="table-wrap">
+                <table id="customersTable">
+                    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Products -->
+    <div id="products" class="hidden">
+        <div class="page-header"><h1>Products</h1><p>Manage your product catalog</p></div>
+        <div class="card">
+            <div class="card-title">New Product</div>
+            <form id="productForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>Product Name</label><input type="text" id="productName" required></div>
+                    <div class="form-group"><label>Category</label><input type="text" id="productCategory" required></div>
+                    <div class="form-group"><label>Brand</label><input type="text" id="productBrand" required></div>
+                    <div class="form-group"><label>Price</label><input type="number" step="0.01" id="productPrice" required></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+                    <button type="button" class="btn btn-ghost" onclick="loadProducts()">Refresh</button>
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="table-wrap">
+                <table id="productsTable">
+                    <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Brand</th><th>Price</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments -->
+    <div id="payments" class="hidden">
+        <div class="page-header"><h1>Payments</h1><p>Track payment records</p></div>
+        <div class="card">
+            <div class="card-title">New Payment</div>
+            <form id="paymentForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>Customer Name</label><input type="text" id="paymentCustomerName" placeholder="Enter customer name"></div>
+                    <div class="form-group"><label>Amount</label><input type="number" step="0.01" id="paymentAmount" required></div>
+                    <div class="form-group"><label>Payment Date</label><input type="date" id="paymentDate" required></div>
+                    <div class="form-group"><label>Method</label>
+                        <select id="paymentMethod">
+                            <option value="CREDIT_CARD">Credit Card</option>
+                            <option value="BANK_TRANSFER">Bank Transfer</option>
+                            <option value="CASH">Cash</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Status</label>
+                        <select id="paymentStatus">
+                            <option value="PENDING">Pending</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+                    <button type="button" class="btn btn-ghost" onclick="loadPayments()">Refresh</button>
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="table-wrap">
+                <table id="paymentsTable">
+                    <thead><tr><th>Customer</th><th>Amount</th><th>Date</th><th>Method</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices -->
+    <div id="invoices" class="hidden">
+        <div class="page-header"><h1>Invoices</h1><p>Generate official invoices by Offer ID</p></div>
+
+        <div class="card" id="inv-lookup-card">
+            <div class="card-title">Invoice Details</div>
+            <div class="form-grid" style="margin-bottom:16px;">
+                <div class="form-group">
+                    <label>Customer ID</label>
+                    <input type="number" id="invoiceCustomerId" placeholder="Enter Customer ID">
+                </div>
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="invoiceCustomerName" placeholder="Enter Customer Name">
+                </div>
+            </div>
+            <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:12px;">Product</div>
+            <div class="form-grid" style="margin-bottom:16px;">
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="invoiceDescription" placeholder="Product description">
+                </div>
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" id="invoicePrice" placeholder="0.00" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Discount (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" id="invoiceDiscount" placeholder="0" value="0">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-ghost" onclick="searchInvoiceCustomer()">Search by Email / Phone</button>
+                <button class="btn btn-primary" onclick="generateManualInvoice()">Generate Invoice</button>
+            </div>
+            <div id="invoiceCustomerList" class="hidden" style="margin-top:16px;">
+                <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Select Offer</div>
+                <div style="display:flex;gap:10px;">
+                    <input type="text" id="invoiceCustomerSearch" placeholder="Enter customer email or phone" style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:0.875rem;">
+                    <button class="btn btn-ghost" onclick="doSearchInvoiceCustomer()">Search</button>
+                </div>
+                <select id="invoiceOfferSelect" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:0.875rem;width:100%;margin-top:10px;display:none;"></select>
+                <button class="btn btn-primary" id="invoiceFromSelectBtn" style="margin-top:10px;display:none;" onclick="loadInvoiceFromSelect()">Load Offer Data</button>
+            </div>
+        </div>
+
+        <div id="invoiceResult" class="hidden">
+            <div class="card" style="background:#fff;color:#111;font-family:'Inter',sans-serif;">
+
+                <!-- Header -->
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #6366f1;margin-bottom:28px;">
+                    <div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#6366f1;letter-spacing:-1px;">CRM System</div>
+                        <div style="font-size:0.75rem;font-weight:600;letter-spacing:2px;color:#94a3b8;margin-top:4px;">OFFICIAL INVOICE</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:1.1rem;font-weight:700;color:#111;" id="ir-number"></div>
+                    </div>
+                </div>
+
+                <!-- Customer Details -->
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6366f1;margin-bottom:10px;">Bill To</div>
+                <div id="ir-customer" style="background:#f8fafc;border-left:4px solid #6366f1;border-radius:8px;padding:16px;font-size:0.875rem;color:#334155;line-height:1.9;margin-bottom:28px;"></div>
+
+                <!-- Summary Cards -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+                    <div style="background:#f0f0ff;border-radius:10px;padding:16px;">
+                        <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#6366f1;margin-bottom:6px;">Price</div>
+                        <div id="ir-summary-price" style="font-size:1.3rem;font-weight:700;color:#111;"></div>
+                    </div>
+                    <div style="background:#fff7ed;border-radius:10px;padding:16px;">
+                        <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#ea580c;margin-bottom:6px;">Discount</div>
+                        <div id="ir-summary-discount" style="font-size:1.3rem;font-weight:700;color:#111;"></div>
+                    </div>
+                    <div style="background:#f0fdf4;border-radius:10px;padding:16px;">
+                        <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#16a34a;margin-bottom:6px;">Total Due</div>
+                        <div id="ir-summary-total" style="font-size:1.3rem;font-weight:700;color:#16a34a;"></div>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6366f1;margin-bottom:10px;">Product Details</div>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:32px;font-size:0.875rem;">
+                    <thead>
+                        <tr style="background:#f1f5f9;">
+                            <th style="padding:10px 14px;text-align:left;color:#475569;font-weight:600;">Description</th>
+                            <th style="padding:10px 14px;text-align:left;color:#475569;font-weight:600;">Price</th>
+                            <th style="padding:10px 14px;text-align:left;color:#475569;font-weight:600;">Discount</th>
+                            <th style="padding:10px 14px;text-align:left;color:#475569;font-weight:600;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ir-offer-body"></tbody>
+                </table>
+
+                <!-- Footer -->
+                <div style="border-top:1px solid #e2e8f0;padding-top:16px;display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:0.78rem;color:#94a3b8;">Thank you for your business &mdash; Generated by CRM System</div>
+                    <div id="inv-actions" style="display:flex;gap:10px;">
+                        <button class="btn btn-ghost" style="color:#334155;background:#f1f5f9;" onclick="window.print()">Print</button>
+                        <button class="btn btn-primary" onclick="downloadInvoicePdf()">Download PDF</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Companies -->
+    <div id="companies" class="hidden">
+        <div class="page-header"><h1>Companies</h1><p>Manage company profiles</p></div>
+        <div class="card">
+            <div class="card-title">New Company</div>
+            <form id="companyForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>Company Name</label><input type="text" id="companyName" required></div>
+                    <div class="form-group"><label>Address</label><input type="text" id="companyAddress" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="companyPhone" required></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="saveCompany()">Save Company</button>
+                    <button type="button" class="btn btn-ghost" onclick="loadCompanies()">Refresh</button>
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="table-wrap">
+                <table id="companiesTable">
+                    <thead><tr><th>ID</th><th>Name</th><th>Address</th><th>Phone</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<div id="toast"></div>
+
+
+<script>
+// Override tab switching to work with sidebar
+function showTab(tabName, el) {
+    document.querySelectorAll('.main > div').forEach(d => d.classList.add('hidden'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(tabName).classList.remove('hidden');
+    if (el) el.classList.add('active');
+}
+
+// Override alert with toast
+window.alert = function(msg) {
+    const toast = document.getElementById('toast');
+    const isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('not found');
+    toast.className = 'show ' + (isError ? 'error' : 'success');
+    toast.textContent = msg;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.className = '', 3000);
+};
+
+// Badge helper for tables
+function badge(val) {
+    const cls = val ? val.toLowerCase() : '';
+    return `<span class="badge badge-${cls}">${val || ''}</span>`;
+}
+</script>
+<script src="app.js"></script>
 </body>
 </html>
+

@@ -24,6 +24,12 @@ public class Offer extends BaseEntity {
     @Column(name = "offer_status")
     private OfferStatus offerStatus;
 
+    @Column(name = "price", precision = 19, scale = 2)
+    private java.math.BigDecimal price;
+
+    @Column(name = "discount_percent")
+    private Double discountPercent;
+
     public Offer() {}
 
     public Offer(Long companyId, Long customerId, String offerDetails, LocalDate offerDate, OfferStatus offerStatus) {
@@ -44,6 +50,10 @@ public class Offer extends BaseEntity {
     public void setOfferDate(LocalDate offerDate) { this.offerDate = offerDate; }
     public OfferStatus getOfferStatus() { return offerStatus; }
     public void setOfferStatus(OfferStatus offerStatus) { this.offerStatus = offerStatus; }
+    public java.math.BigDecimal getPrice() { return price; }
+    public void setPrice(java.math.BigDecimal price) { this.price = price; }
+    public Double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(Double discountPercent) { this.discountPercent = discountPercent; }
 
     public enum OfferStatus {
         ACCEPTED,

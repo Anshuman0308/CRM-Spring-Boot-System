@@ -65,6 +65,12 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -76,6 +82,10 @@
                     <excludes>
                         <excludeDevtools>false</excludeDevtools>
                     </excludes>
+                    <jvmArguments>
+                        -XX:+EnableDynamicAgentLoading
+                        --enable-native-access=ALL-UNNAMED
+                    </jvmArguments>
                 </configuration>
             </plugin>
             <plugin>

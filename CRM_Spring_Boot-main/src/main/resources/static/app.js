@@ -1,13 +1,6 @@
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'http://localhost:8081/api';
 
-// Tab Management
-function showTab(tabName) {
-    document.querySelectorAll('.content').forEach(content => content.classList.add('hidden'));
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    
-    document.getElementById(tabName).classList.remove('hidden');
-    event.target.classList.add('active');
-}
+// Tab Management handled in index.html
 
 // Customer Functions
 async function saveCustomer() {
@@ -53,9 +46,7 @@ async function loadCustomers() {
                 <td>${customer.firstName} ${customer.lastName}</td>
                 <td>${customer.email}</td>
                 <td>${customer.phone || ''}</td>
-                <td>
-                    <button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button>
-                </td>
+                <td><button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button></td>
             `;
         });
     } catch (error) {
@@ -83,9 +74,7 @@ async function searchCustomer() {
                     <td>${customer.firstName} ${customer.lastName}</td>
                     <td>${customer.email}</td>
                     <td>${customer.phone || ''}</td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button>
-                    </td>
+                    <td><button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button></td>
                 </tr>
             `;
         } else {
@@ -105,77 +94,6 @@ async function deleteCustomer(id) {
                 loadCustomers();
             } else {
                 alert('Error deleting customer');
-            }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    }
-}
-
-// Offer Functions
-async function saveOffer() {
-    const offer = {
-        customerId: parseInt(document.getElementById('offerCustomerId').value),
-        companyId: parseInt(document.getElementById('offerCompanyId').value),
-        offerDetails: document.getElementById('offerDetails').value,
-        offerDate: document.getElementById('offerDate').value,
-        offerStatus: document.getElementById('offerStatus').value
-    };
-
-    try {
-        const response = await fetch(`${API_BASE}/offers`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(offer)
-        });
-        
-        if (response.ok) {
-            alert('Offer saved successfully!');
-            document.getElementById('offerForm').reset();
-            loadOffers();
-        } else {
-            alert('Error saving offer');
-        }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
-}
-
-async function loadOffers() {
-    try {
-        const response = await fetch(`${API_BASE}/offers`);
-        const offers = await response.json();
-        
-        const tbody = document.querySelector('#offersTable tbody');
-        tbody.innerHTML = '';
-        
-        offers.forEach(offer => {
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td>${offer.id}</td>
-                <td>${offer.customerId}</td>
-                <td>${offer.offerDetails}</td>
-                <td>${offer.offerDate}</td>
-                <td>${offer.offerStatus}</td>
-                <td>
-                    <button class="btn btn-danger" onclick="deleteOffer(${offer.id})">Delete</button>
-                </td>
-            `;
-        });
-    } catch (error) {
-        alert('Error loading offers: ' + error.message);
-    }
-}
-
-async function deleteOffer(id) {
-    if (confirm('Are you sure you want to delete this offer?')) {
-        try {
-            const response = await fetch(`${API_BASE}/offers/${id}`, { method: 'DELETE' });
-            if (response.ok) {
-                alert('Offer deleted successfully!');
-                loadOffers();
-            } else {
-                alert('Error deleting offer');
             }
         } catch (error) {
             alert('Error: ' + error.message);
@@ -226,7 +144,7 @@ async function loadProducts() {
                 <td>${product.name}</td>
                 <td>${product.category}</td>
                 <td>${product.brand}</td>
-                <td>$${product.price}</td>
+                <td>&#8377;${product.price}</td>
                 <td>
                     <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
                 </td>
@@ -256,7 +174,7 @@ async function deleteProduct(id) {
 // Payment Functions
 async function savePayment() {
     const payment = {
-        offerId: parseInt(document.getElementById('paymentOfferId').value),
+        payerName: document.getElementById('paymentCustomerName').value,
         paymentAmount: parseFloat(document.getElementById('paymentAmount').value),
         paymentDate: document.getElementById('paymentDate').value,
         paymentMethod: document.getElementById('paymentMethod').value,
@@ -293,15 +211,12 @@ async function loadPayments() {
         payments.forEach(payment => {
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td>${payment.id}</td>
-                <td>${payment.offerId}</td>
-                <td>$${payment.paymentAmount}</td>
+                <td>${payment.customerName || '-'}</td>
+                <td>&#8377;${payment.paymentAmount}</td>
                 <td>${payment.paymentDate}</td>
                 <td>${payment.paymentMethod}</td>
-                <td>${payment.paymentStatus}</td>
-                <td>
-                    <button class="btn btn-danger" onclick="deletePayment(${payment.id})">Delete</button>
-                </td>
+                <td>${badge(payment.paymentStatus)}</td>
+                <td><button class="btn btn-danger" onclick="deletePayment(${payment.id})">Delete</button></td>
             `;
         });
     } catch (error) {
@@ -393,7 +308,117 @@ async function deleteCompany(id) {
     }
 }
 
-// Load initial data
+// Invoice Functions
+let currentInvoiceOfferId = null;
+
+function generateManualInvoice() {
+    const customerId = document.getElementById('invoiceCustomerId').value;
+    const customerName = document.getElementById('invoiceCustomerName').value;
+    const description = document.getElementById('invoiceDescription').value;
+    const price = parseFloat(document.getElementById('invoicePrice').value) || 0;
+    const discount = parseFloat(document.getElementById('invoiceDiscount').value) || 0;
+    if (!customerName && !customerId) { alert('Please enter a Customer ID or Name'); return; }
+    const discountAmount = (price * discount / 100).toFixed(2);
+    const total = (price - discountAmount).toFixed(2);
+    document.getElementById('ir-number').textContent = customerId ? `INV-${String(customerId).padStart(5,'0')}` : 'INV-DRAFT';
+    document.getElementById('ir-customer').innerHTML = `<strong style="font-size:1rem;">${customerName || 'Customer #' + customerId}</strong>`;
+    document.getElementById('ir-summary-price').textContent = `&#8377;${price.toFixed(2)}`;
+    document.getElementById('ir-summary-discount').textContent = discount > 0 ? `${discount}% (-&#8377;${discountAmount})` : 'No discount';
+    document.getElementById('ir-summary-total').textContent = `&#8377;${total}`;
+    document.getElementById('ir-offer-body').innerHTML = `
+        <tr>
+            <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;">${description || '-'}</td>
+            <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;">&#8377;${price.toFixed(2)}</td>
+            <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;">${discount > 0 ? discount + '% (-$' + discountAmount + ')' : '-'}</td>
+            <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#16a34a;">&#8377;${total}</td>
+        </tr>`;
+    document.getElementById('invoiceResult').classList.remove('hidden');
+    document.getElementById('invoiceResult').scrollIntoView({ behavior: 'smooth' });
+}
+
+function searchInvoiceCustomer() {
+    document.getElementById('invoiceCustomerList').classList.remove('hidden');
+}
+
+async function doSearchInvoiceCustomer() {
+    const term = document.getElementById('invoiceCustomerSearch').value;
+    if (!term) return;
+    try {
+        const url = term.includes('@') ? `${API_BASE}/customers/email/${term}` : `${API_BASE}/customers/phone/${term}`;
+        const res = await fetch(url);
+        if (!res.ok) { alert('Customer not found'); return; }
+        const customer = await res.json();
+        document.getElementById('invoiceCustomerId').value = customer.id;
+        document.getElementById('invoiceCustomerName').value = customer.firstName + ' ' + customer.lastName;
+        const offersRes = await fetch(`${API_BASE}/offers/customer/${customer.id}`);
+        const offers = await offersRes.json();
+        if (!offers.length) { alert('No offers found for this customer'); return; }
+        const select = document.getElementById('invoiceOfferSelect');
+        select.innerHTML = offers.map(o => `<option value="${o.id}">Offer #${o.id} - ${o.offerDetails} (${o.offerDate})</option>`).join('');
+        select.style.display = 'block';
+        document.getElementById('invoiceFromSelectBtn').style.display = 'inline-block';
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function loadInvoiceFromSelect() {
+    const offerId = document.getElementById('invoiceOfferSelect').value;
+    if (!offerId) return;
+    currentInvoiceOfferId = offerId;
+    try {
+        const response = await fetch(`${API_BASE}/invoices/offer/${offerId}`);
+        if (!response.ok) { alert('Invoice not found'); return; }
+        const inv = await response.json();
+        document.getElementById('invoiceCustomerName').value = inv.customerName || '';
+        document.getElementById('invoiceDescription').value = inv.description || '';
+        document.getElementById('invoicePrice').value = inv.price || 0;
+        document.getElementById('invoiceDiscount').value = inv.discountPercent || 0;
+        generateManualInvoice();
+        document.getElementById('ir-number').textContent = `INV-${String(inv.invoiceNo).padStart(5,'0')}`;
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function loadInvoice(offerId) {
+    currentInvoiceOfferId = offerId;
+    try {
+        const response = await fetch(`${API_BASE}/invoices/offer/${offerId}`);
+        if (!response.ok) { alert('Invoice not found for offer ID: ' + offerId); return; }
+        const inv = await response.json();
+        document.getElementById('invoiceCustomerName').value = inv.customerName || '';
+        document.getElementById('invoiceDescription').value = inv.description || '';
+        document.getElementById('invoicePrice').value = inv.price || 0;
+        document.getElementById('invoiceDiscount').value = inv.discountPercent || 0;
+        generateManualInvoice();
+        document.getElementById('ir-number').textContent = `INV-${String(inv.invoiceNo).padStart(5,'0')}`;
+    } catch (error) {
+        alert('Error loading invoice: ' + error.message);
+    }
+}
+
+function downloadInvoicePdf() {
+    if (!currentInvoiceOfferId) return;
+    window.location.href = `${API_BASE}/invoices/offer/${currentInvoiceOfferId}/pdf`;
+}
+
+// Load initial data silently (no error toast on startup)
 document.addEventListener('DOMContentLoaded', function() {
-    loadCustomers();
+    fetch(`${API_BASE}/customers`)
+        .then(r => r.json())
+        .then(customers => {
+            const tbody = document.querySelector('#customersTable tbody');
+            customers.forEach(customer => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                <td>${customer.id}</td>
+                <td>${customer.firstName} ${customer.lastName}</td>
+                <td>${customer.email}</td>
+                <td>${customer.phone || ''}</td>
+                <td><button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button></td>`;
+            });
+        })
+        .catch(() => {});
 });
+

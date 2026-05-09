@@ -1,7 +1,9 @@
 package dev.nida.crm.controller;
 
+import dev.nida.crm.dto.PaymentResponse;
 import dev.nida.crm.entities.Payment;
 import dev.nida.crm.repository.PaymentRepository;
+import dev.nida.crm.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,14 +13,16 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
 
-    public PaymentController(PaymentRepository paymentRepository) {
+    public PaymentController(PaymentRepository paymentRepository, PaymentService paymentService) {
         this.paymentRepository = paymentRepository;
+        this.paymentService    = paymentService;
     }
 
     @GetMapping
-    public List<Payment> getAllPayments() {
-        return paymentRepository.findAll();
+    public List<PaymentResponse> getAllPayments() {
+        return paymentService.getAllWithCustomerName();
     }
 
     @GetMapping("/{id}")
