@@ -82,11 +82,11 @@ public class InvoiceController {
                     .add(new Paragraph(h).setFont(bold).setFontSize(9).setFontColor(muted)));
         }
         String discountLabel = inv.getDiscountPercent() > 0
-                ? inv.getDiscountPercent() + "% (-$" + inv.getDiscountAmount() + ")" : "-";
+                ? inv.getDiscountPercent() + "% (-Rs." + inv.getDiscountAmount() + ")" : "-";
         itemTable.addCell(new Cell().setBorder(null).add(new Paragraph(inv.getDescription() != null ? inv.getDescription() : "").setFont(regular).setFontSize(9)));
-        itemTable.addCell(new Cell().setBorder(null).add(new Paragraph("$" + inv.getPrice()).setFont(regular).setFontSize(9)));
+        itemTable.addCell(new Cell().setBorder(null).add(new Paragraph("Rs." + inv.getPrice()).setFont(regular).setFontSize(9)));
         itemTable.addCell(new Cell().setBorder(null).add(new Paragraph(discountLabel).setFont(regular).setFontSize(9)));
-        itemTable.addCell(new Cell().setBorder(null).add(new Paragraph("$" + inv.getTotalAmount()).setFont(bold).setFontSize(10).setFontColor(green)));
+        itemTable.addCell(new Cell().setBorder(null).add(new Paragraph("Rs." + inv.getTotalAmount()).setFont(bold).setFontSize(10).setFontColor(green)));
         doc.add(itemTable);
 
         // Footer

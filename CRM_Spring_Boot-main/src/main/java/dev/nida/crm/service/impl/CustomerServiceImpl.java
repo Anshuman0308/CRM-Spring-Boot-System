@@ -3,10 +3,13 @@ package dev.nida.crm.service.impl;
 import dev.nida.crm.entities.Customer;
 import dev.nida.crm.repository.CustomerRepository;
 import dev.nida.crm.service.CustomerService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -24,6 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Cacheable(value = "customers", key = "#id")
     @Transactional(readOnly = true)
     public Customer getById(long id) {
         return customerRepository.findById(id)
@@ -31,12 +35,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Cacheable(value = "customer-list", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(readOnly = true)
-    public List<Customer> getAll() {
-        return customerRepository.findAll();
+    public Page<Customer> getAll(Pageable pageable) {
+        return customerRepository.findAll(pageable);
     }
 
     @Override
+    @CacheEvict(value = {"customers", "customer-list", "dashboard"}, allEntries = true)
     @Transactional
     public Customer save(Customer customer) {
         if (customer == null) {
@@ -46,6 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @CacheEvict(value = {"customers", "customer-list", "dashboard"}, allEntries = true)
     @Transactional
     public Customer update(Customer customer) {
         if (customer == null) {
@@ -66,6 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @CacheEvict(value = {"customers", "customer-list", "dashboard"}, allEntries = true)
     @Transactional
     public void deleteById(long id) {
         if (!customerRepository.existsById(id)) {

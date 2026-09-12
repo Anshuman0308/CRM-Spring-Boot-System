@@ -32,11 +32,6 @@ public class PaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/offer/{offerId}")
-    public List<Payment> getPaymentsByOffer(@PathVariable Long offerId) {
-        return paymentRepository.findByOfferId(offerId);
-    }
-
     @PostMapping
     public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
         try {

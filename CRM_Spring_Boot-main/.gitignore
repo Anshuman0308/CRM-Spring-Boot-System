@@ -20,6 +20,7 @@ Thumbs.db
 
 # Application properties with sensitive data
 application-dev.properties
+.env
 
 # Maven
 .mvn/

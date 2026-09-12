@@ -1,7 +1,6 @@
 package dev.nida.crm.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,16 +29,6 @@ public class Payment extends BaseEntity {
     @Column(name = "payer_name")
     private String payerName;
 
-    @Email
-    @Column(name = "payer_email")
-    private String payerEmail;
-
-    @Column(name = "payer_phone")
-    private String payerPhone;
-
-    @Column(name = "notes")
-    private String notes;
-
     public Payment() {}
 
     public long getOfferId() { return offerId; }
@@ -54,13 +43,6 @@ public class Payment extends BaseEntity {
     public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
     public String getPayerName() { return payerName; }
     public void setPayerName(String payerName) { this.payerName = payerName; }
-    public String getPayerEmail() { return payerEmail; }
-    public void setPayerEmail(String payerEmail) { this.payerEmail = payerEmail; }
-    public String getPayerPhone() { return payerPhone; }
-    public void setPayerPhone(String payerPhone) { this.payerPhone = payerPhone; }
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
-
     public enum PaymentMethod {
         CREDIT_CARD,
         BANK_TRANSFER,
