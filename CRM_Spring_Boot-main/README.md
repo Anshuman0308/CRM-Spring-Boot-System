@@ -343,22 +343,10 @@ Customer  ──< Offer >── Company
 
 ---
 
-## Railway Deployment
-
-1. Create a new Railway project
-2. Add a **PostgreSQL** service
-3. Set environment variables:
-   - `DATABASE_URL` → `${{Postgres.DATABASE_URL}}`
-   - `DATABASE_USERNAME` → `${{Postgres.PGUSER}}`
-   - `DATABASE_PASSWORD` → `${{Postgres.PGPASSWORD}}`
-   - `REDIS_HOST` → `${{Redis.REDIS_HOST}}`
-   - `REDIS_PORT` → `${{Redis.REDIS_PORT}}`
-   - `REDIS_PASSWORD` → `${{Redis.REDIS_PASSWORD}}`
-   - `JWT_SECRET` → your secure random string
 
 ---
 
 ## Author
 
-Developed by **Nida** — CRM Spring Boot Project  
-Maintained by **Anshuman**
+Developed by **Anshuman** — CRM Spring Boot Project  
+
